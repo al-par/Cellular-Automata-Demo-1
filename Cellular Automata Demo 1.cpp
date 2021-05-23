@@ -50,6 +50,72 @@ int main()
 	al_start_timer(timer);
 
 
+	//___________________________________________________________________________________________________________________________________________________________________
+	//update loop variable declarations
+
+	//update loop boolean
+	bool running = true;
+
+	//keyboard
+	bool pressed_keys[ALLEGRO_KEY_MAX];
+	for (int i = 0; i < ALLEGRO_KEY_MAX; i++) pressed_keys[i] = false; //set all key presses to false by default
+
+
+	//___________________________________________________________________________________________________________________________________________________________________
+	//game update loop
+	while (running)
+	{
+		//---------------------------------------------------------------------------------------------------------------------------------------------------------------
+		//Event handling
+		ALLEGRO_EVENT event;
+		bool waiting = true;
+		while (waiting) //Make update loop wait for an event
+		{
+			al_wait_for_event(queue, &event);
+			if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) /*Terminate Program*/
+			{
+				running = false;
+				waiting = false;
+				returnCode -= 1; // changing the return code like this instead of setting it to a new value allows the program to return with multiple return codes.
+				//yes, I know logging would be 'better', but this isnt a very complex program, and there aren't many return codes.
+			}
+
+			//---------------------------------------------------------------------------------------------------------------------------------------------------------------
+			//Update Keyboard
+			else if (event.type == ALLEGRO_EVENT_KEY_DOWN)
+			{
+				for (int i = 0; i < ALLEGRO_KEY_MAX; i++)
+				{
+					if (event.keyboard.keycode == i)
+					{
+						pressed_keys[i] = true;
+						cout << i << endl;
+					}
+				}
+			}
+			else if (event.type == ALLEGRO_EVENT_KEY_UP)
+			{
+				for (int i = 0; i < ALLEGRO_KEY_MAX; i++)
+				{
+					if (event.keyboard.keycode == i)
+					{
+						pressed_keys[i] = false;
+					}
+				}
+			}
+
+
+			//---------------------------------------------------------------------------------------------------------------------------------------------------------------
+			//update and display page
+			else if (event.type == ALLEGRO_EVENT_TIMER)
+			{
+				al_clear_to_color(al_map_rgb(255, 255, 255));
+				al_flip_display();
+				waiting = false;
+			}
+		}
+	}
+
 
 	//___________________________________________________________________________________________________________________________________________________________________
 	//destructors and cleanup
