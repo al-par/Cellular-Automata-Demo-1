@@ -14,11 +14,12 @@
 //display properties
 #define DISPLAY_WIDTH 1920
 #define DISPLAY_HEIGHT 1080
-#define FRAMERATE 60 //This value is in frames per second
+#define FRAMERATE 20 //This value is in frames per second
 
 //cell properties
 #define CELL_SIZE 10 //must be a common multiple of both DISPLAY_WIDTH and DISPLAY_HEIGHT
 #define CELL_SPAWN_CHANCE_INITIAL 10 //higher values decrease the probability of a cell spawning initially
+#define NEIGHBOR_SELECTION_TYPE 'von Neumann' //options are 'von Neumann' and 'moore'
 
 using namespace std;
 
@@ -168,6 +169,13 @@ int main()
 						}
 						if (i - 1 > 0) if (cellAlive[i - 1][j] == true) neighborsAlive++; //middle left
 						if (i + 1 < x) if (cellAlive[i + 1][j] == true) neighborsAlive++; //middle right
+
+						//update cell state based on rules
+						//currently using the ruleset for Conway's Game of Life
+						if (cellAlive[i][j] && neighborsAlive < 2)   cellAlive[i][j] = false; //Rule 1: Underpopulation
+						if (!cellAlive[i][j] && neighborsAlive == 3) cellAlive[i][j] = true;  //Rule 2: Reproduction
+						if (cellAlive[i][j] && neighborsAlive > 3)   cellAlive[i][j] = false; //Rule 3: Overpopulation
+
 					}
 				}
 
