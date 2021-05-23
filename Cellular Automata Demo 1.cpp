@@ -129,8 +129,8 @@ int main()
 			{
 				al_clear_to_color(al_map_rgba(255, 255, 255, 0));
 				
-
-				for (int i = 0; i < DISPLAY_WIDTH / CELL_SIZE; i++) //parse cells and draw ones that are alive
+				//display living cells
+				for (int i = 0; i < DISPLAY_WIDTH / CELL_SIZE; i++)
 				{
 					for (int j = 0; j < DISPLAY_HEIGHT / CELL_SIZE; j++)
 					{
@@ -141,6 +141,33 @@ int main()
 								i * CELL_SIZE + CELL_SIZE, j * CELL_SIZE + CELL_SIZE,
 								al_map_rgb(0, 0, 0));
 						}
+					}
+				}
+
+				//update cell state
+				for (int i = 0; i < DISPLAY_WIDTH / CELL_SIZE; i++)
+				{
+					for (int j = 0; j < DISPLAY_HEIGHT / CELL_SIZE; j++)
+					{ 
+						//count neighbors (moore neighbors)
+						int neighborsAlive = 0;
+						int x = DISPLAY_WIDTH / CELL_SIZE;
+						int y = DISPLAY_HEIGHT / CELL_SIZE;
+
+						if (j - 1 > 0)
+						{
+							if (i - 1 > 0)	if (cellAlive[i - 1][j - 1] == true) neighborsAlive++; //top left
+											if (cellAlive[i    ][j - 1] == true) neighborsAlive++; //top middle
+							if (i + 1 < x)	if (cellAlive[i + 1][j - 1] == true) neighborsAlive++; //top right
+						}
+						if (j + 1 < y)
+						{
+							if (i - 1 > 0) if (cellAlive[i - 1][j + 1] == true) neighborsAlive++; //bottom left
+										   if (cellAlive[i    ][j + 1] == true) neighborsAlive++; //bottom middle
+							if (i + 1 < x) if (cellAlive[i + 1][j + 1] == true) neighborsAlive++; //bottom right
+						}
+						if (i - 1 > 0) if (cellAlive[i - 1][j] == true) neighborsAlive++; //middle left
+						if (i + 1 < x) if (cellAlive[i + 1][j] == true) neighborsAlive++; //middle right
 					}
 				}
 
