@@ -11,10 +11,14 @@
 #include <allegro5/allegro_primitives.h>
 
 
+//display properties
 #define DISPLAY_WIDTH 1920
 #define DISPLAY_HEIGHT 1080
 #define FRAMERATE 60 //This value is in frames per second
 
+//cell properties
+#define CELL_SIZE 10 //must be a common multiple of both DISPLAY_WIDTH and DISPLAY_HEIGHT
+#define CELL_SPAWN_CHANCE_INITIAL 10 //higher values decrease the probability of a cell spawning initially
 
 using namespace std;
 
@@ -59,6 +63,20 @@ int main()
 	//keyboard
 	bool pressed_keys[ALLEGRO_KEY_MAX];
 	for (int i = 0; i < ALLEGRO_KEY_MAX; i++) pressed_keys[i] = false; //set all key presses to false by default
+
+	//cells
+	bool cellAlive[DISPLAY_WIDTH / CELL_SIZE][DISPLAY_HEIGHT / CELL_SIZE];
+	for (int i = 0; i < DISPLAY_WIDTH / CELL_SIZE; i++) //spawn initial cells
+	{
+		for (int j = 0; j < DISPLAY_HEIGHT / CELL_SIZE; j++)
+		{
+			if (rand() % CELL_SPAWN_CHANCE_INITIAL == 0)
+			{
+				cellAlive[i][j] = true;
+			}
+			else cellAlive[i][j] = false;
+		}
+	}
 
 
 	//___________________________________________________________________________________________________________________________________________________________________
@@ -109,7 +127,23 @@ int main()
 			//update and display page
 			else if (event.type == ALLEGRO_EVENT_TIMER)
 			{
-				al_clear_to_color(al_map_rgb(255, 255, 255));
+				al_clear_to_color(al_map_rgba(255, 255, 255, 0));
+				
+
+				for (int i = 0; i < DISPLAY_WIDTH / CELL_SIZE; i++) //parse cells and draw ones that are alive
+				{
+					for (int j = 0; j < DISPLAY_HEIGHT / CELL_SIZE; j++)
+					{
+						if (cellAlive[i][j] == true)
+						{
+							al_draw_filled_rectangle(
+								i * CELL_SIZE, j * CELL_SIZE,
+								i * CELL_SIZE + CELL_SIZE, j * CELL_SIZE + CELL_SIZE,
+								al_map_rgb(0, 0, 0));
+						}
+					}
+				}
+
 				al_flip_display();
 				waiting = false;
 			}
