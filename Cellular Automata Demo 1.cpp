@@ -14,11 +14,11 @@
 //display properties
 #define DISPLAY_WIDTH 1920
 #define DISPLAY_HEIGHT 1080
-#define FRAMERATE 3 //This value is in frames per second
+#define FRAMERATE 5 //This value is in frames per second
 
 //cell properties
 #define CELL_SIZE 10 //must be a common multiple of both DISPLAY_WIDTH and DISPLAY_HEIGHT
-#define CELL_SPAWN_CHANCE_INITIAL 20 //higher values decrease the probability of a cell spawning initially
+#define CELL_SPAWN_CHANCE_INITIAL 15 //higher values decrease the probability of a cell spawning initially
 #define CELL_NEIGHBOR_SELECTION_TYPE "Moore" //options are "von Neumann" and "Moore"
 
 using namespace std;
@@ -126,7 +126,7 @@ int main()
 
 			//---------------------------------------------------------------------------------------------------------------------------------------------------------------
 			//update and display page
-			else if (event.type == ALLEGRO_EVENT_TIMER)
+			else if (event.type == ALLEGRO_EVENT_TIMER && !pressed_keys[ALLEGRO_KEY_SPACE])
 			{
 				al_clear_to_color(al_map_rgba(255, 255, 255, 0));
 				
@@ -149,43 +149,43 @@ int main()
 				for (int i = 0; i < DISPLAY_WIDTH / CELL_SIZE; i++)
 				{
 					for (int j = 0; j < DISPLAY_HEIGHT / CELL_SIZE; j++)
-					{ 
-						//count neighbors (moore neighbors)
+					{
+						//count neighbors
 						int neighborsAlive = 0;
 						int x = DISPLAY_WIDTH / CELL_SIZE;
 						int y = DISPLAY_HEIGHT / CELL_SIZE;
 
 						if (CELL_NEIGHBOR_SELECTION_TYPE == "Moore")
 						{
-							if (j - 1 > 0)
+							if (j - 1 >= 0)
 							{
-								if (i - 1 > 0)	if (cellAlive[i - 1][j - 1] == true) neighborsAlive++; //top left
-												if (cellAlive[i    ][j - 1] == true) neighborsAlive++; //top middle
-								if (i + 1 < x)	if (cellAlive[i + 1][j - 1] == true) neighborsAlive++; //top right
+								if (i - 1 >= 0)	if (cellAlive[i - 1][j - 1] == true) neighborsAlive++; //top left
+								if (cellAlive[i][j - 1] == true) neighborsAlive++; //top middle
+								if (i + 1 <= x)	if (cellAlive[i + 1][j - 1] == true) neighborsAlive++; //top right
 							}
-							if (j + 1 < y)
+							if (j + 1 <= y)
 							{
-								if (i - 1 > 0) if (cellAlive[i - 1][j + 1] == true) neighborsAlive++; //bottom left
-											   if (cellAlive[i    ][j + 1] == true) neighborsAlive++; //bottom middle
-								if (i + 1 < x) if (cellAlive[i + 1][j + 1] == true) neighborsAlive++; //bottom right
+								if (i - 1 >= 0) if (cellAlive[i - 1][j + 1] == true) neighborsAlive++; //bottom left
+								if (cellAlive[i][j + 1] == true) neighborsAlive++; //bottom middle
+								if (i + 1 <= x) if (cellAlive[i + 1][j + 1] == true) neighborsAlive++; //bottom right
 							}
 							if (i - 1 > 0) if (cellAlive[i - 1][j] == true) neighborsAlive++; //middle left
 							if (i + 1 < x) if (cellAlive[i + 1][j] == true) neighborsAlive++; //middle right
 						}
 						else if (CELL_NEIGHBOR_SELECTION_TYPE == "von Neumann")
 						{
-							if (j - 1 > 0) if (cellAlive[i    ][j - 1] == true) neighborsAlive++; //top middle
-							if (j + 1 < y) if (cellAlive[i    ][j + 1] == true) neighborsAlive++; //bottom middle
-							if (i - 1 > 0) if (cellAlive[i - 1][j    ] == true) neighborsAlive++; //middle left
-							if (i + 1 < x) if (cellAlive[i + 1][j    ] == true) neighborsAlive++; //middle right
+							if (j - 1 >= 0) if (cellAlive[i][j - 1] == true) neighborsAlive++; //top middle
+							if (j + 1 <= y) if (cellAlive[i][j + 1] == true) neighborsAlive++; //bottom middle
+							if (i - 1 >= 0) if (cellAlive[i - 1][j] == true) neighborsAlive++; //middle left
+							if (i + 1 <= x) if (cellAlive[i + 1][j] == true) neighborsAlive++; //middle right
 						}
 
 						//update cell state based on rules
 						//currently using the ruleset for Conway's Game of Life
-						if (cellAlive[i][j] && neighborsAlive < 2)   cellAlive[i][j] = false; //Rule 1: Underpopulation
-						if (!cellAlive[i][j] && neighborsAlive == 3) cellAlive[i][j] = true;  //Rule 2: Reproduction
-						if (cellAlive[i][j] && neighborsAlive > 3)   cellAlive[i][j] = false; //Rule 3: Overpopulation
-
+						if (cellAlive[i][j] && neighborsAlive < 2)        cellAlive[i][j] = false; //Rule 1: Underpopulation
+						else if (!cellAlive[i][j] && neighborsAlive == 3) cellAlive[i][j] = true;  //Rule 2: Reproduction
+						else if (cellAlive[i][j] && neighborsAlive > 3)   cellAlive[i][j] = false; //Rule 3: Overpopulation
+						//if (i == 0 || i == x || j == 0 || j == y) cellAlive[i][j] = false; //Custom Rule: Edges Kill
 					}
 				}
 
