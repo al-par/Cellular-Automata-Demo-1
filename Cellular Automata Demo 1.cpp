@@ -14,12 +14,12 @@
 //display properties
 #define DISPLAY_WIDTH 1920
 #define DISPLAY_HEIGHT 1080
-#define FRAMERATE 20 //This value is in frames per second
+#define FRAMERATE 3 //This value is in frames per second
 
 //cell properties
 #define CELL_SIZE 10 //must be a common multiple of both DISPLAY_WIDTH and DISPLAY_HEIGHT
-#define CELL_SPAWN_CHANCE_INITIAL 10 //higher values decrease the probability of a cell spawning initially
-#define NEIGHBOR_SELECTION_TYPE 'von Neumann' //options are 'von Neumann' and 'moore'
+#define CELL_SPAWN_CHANCE_INITIAL 20 //higher values decrease the probability of a cell spawning initially
+#define CELL_NEIGHBOR_SELECTION_TYPE "Moore" //options are "von Neumann" and "Moore"
 
 using namespace std;
 
@@ -155,20 +155,30 @@ int main()
 						int x = DISPLAY_WIDTH / CELL_SIZE;
 						int y = DISPLAY_HEIGHT / CELL_SIZE;
 
-						if (j - 1 > 0)
+						if (CELL_NEIGHBOR_SELECTION_TYPE == "Moore")
 						{
-							if (i - 1 > 0)	if (cellAlive[i - 1][j - 1] == true) neighborsAlive++; //top left
-											if (cellAlive[i    ][j - 1] == true) neighborsAlive++; //top middle
-							if (i + 1 < x)	if (cellAlive[i + 1][j - 1] == true) neighborsAlive++; //top right
+							if (j - 1 > 0)
+							{
+								if (i - 1 > 0)	if (cellAlive[i - 1][j - 1] == true) neighborsAlive++; //top left
+												if (cellAlive[i    ][j - 1] == true) neighborsAlive++; //top middle
+								if (i + 1 < x)	if (cellAlive[i + 1][j - 1] == true) neighborsAlive++; //top right
+							}
+							if (j + 1 < y)
+							{
+								if (i - 1 > 0) if (cellAlive[i - 1][j + 1] == true) neighborsAlive++; //bottom left
+											   if (cellAlive[i    ][j + 1] == true) neighborsAlive++; //bottom middle
+								if (i + 1 < x) if (cellAlive[i + 1][j + 1] == true) neighborsAlive++; //bottom right
+							}
+							if (i - 1 > 0) if (cellAlive[i - 1][j] == true) neighborsAlive++; //middle left
+							if (i + 1 < x) if (cellAlive[i + 1][j] == true) neighborsAlive++; //middle right
 						}
-						if (j + 1 < y)
+						else if (CELL_NEIGHBOR_SELECTION_TYPE == "von Neumann")
 						{
-							if (i - 1 > 0) if (cellAlive[i - 1][j + 1] == true) neighborsAlive++; //bottom left
-										   if (cellAlive[i    ][j + 1] == true) neighborsAlive++; //bottom middle
-							if (i + 1 < x) if (cellAlive[i + 1][j + 1] == true) neighborsAlive++; //bottom right
+							if (j - 1 > 0) if (cellAlive[i    ][j - 1] == true) neighborsAlive++; //top middle
+							if (j + 1 < y) if (cellAlive[i    ][j + 1] == true) neighborsAlive++; //bottom middle
+							if (i - 1 > 0) if (cellAlive[i - 1][j    ] == true) neighborsAlive++; //middle left
+							if (i + 1 < x) if (cellAlive[i + 1][j    ] == true) neighborsAlive++; //middle right
 						}
-						if (i - 1 > 0) if (cellAlive[i - 1][j] == true) neighborsAlive++; //middle left
-						if (i + 1 < x) if (cellAlive[i + 1][j] == true) neighborsAlive++; //middle right
 
 						//update cell state based on rules
 						//currently using the ruleset for Conway's Game of Life
