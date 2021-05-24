@@ -64,6 +64,7 @@ int main()
 	//keyboard
 	bool pressed_keys[ALLEGRO_KEY_MAX];
 	for (int i = 0; i < ALLEGRO_KEY_MAX; i++) pressed_keys[i] = false; //set all key presses to false by default
+	bool paused = false;
 
 	//cells
 	bool cellAlive[DISPLAY_WIDTH / CELL_SIZE][DISPLAY_HEIGHT / CELL_SIZE];
@@ -122,8 +123,28 @@ int main()
 					{
 						pressed_keys[i] = false;
 					}
+					if (event.keyboard.keycode == ALLEGRO_KEY_SPACE)
+					{
+						if (paused == true) paused = false;
+						if (paused == false) paused = true;
+					}
 				}
 			}
+
+
+			//---------------------------------------------------------------------------------------------------------------------------------------------------------------
+			//Update Mouse
+			else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN)
+			{
+				paused = true;
+			}
+			else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP)
+			{
+				paused = false;
+			}
+
+
+
 
 
 			//---------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -147,48 +168,51 @@ int main()
 					}
 				}
 
-				//update cell state
-				for (int i = 0; i < DISPLAY_WIDTH / CELL_SIZE; i++)
+				if (!paused)
 				{
-					for (int j = 0; j < DISPLAY_HEIGHT / CELL_SIZE; j++)
+					//update cell state
+					for (int i = 0; i < DISPLAY_WIDTH / CELL_SIZE; i++)
 					{
-						//count neighbors
-						int neighborsAlive = 0;
-						int x = DISPLAY_WIDTH / CELL_SIZE;
-						int y = DISPLAY_HEIGHT / CELL_SIZE;
-
-						if (CELL_NEIGHBOR_SELECTION_TYPE == "Moore")
+						for (int j = 0; j < DISPLAY_HEIGHT / CELL_SIZE; j++)
 						{
-							if (j - 1 >= 0)
-							{
-								if (i - 1 >= 0)	if (cellAlive[i - 1][j - 1] == true) neighborsAlive++; //top left
-								if (cellAlive[i][j - 1] == true) neighborsAlive++; //top middle
-								if (i + 1 <= x)	if (cellAlive[i + 1][j - 1] == true) neighborsAlive++; //top right
-							}
-							if (j + 1 <= y)
-							{
-								if (i - 1 >= 0) if (cellAlive[i - 1][j + 1] == true) neighborsAlive++; //bottom left
-								if (cellAlive[i][j + 1] == true) neighborsAlive++; //bottom middle
-								if (i + 1 <= x) if (cellAlive[i + 1][j + 1] == true) neighborsAlive++; //bottom right
-							}
-							if (i - 1 > 0) if (cellAlive[i - 1][j] == true) neighborsAlive++; //middle left
-							if (i + 1 < x) if (cellAlive[i + 1][j] == true) neighborsAlive++; //middle right
-						}
-						else if (CELL_NEIGHBOR_SELECTION_TYPE == "von Neumann")
-						{
-							if (j - 1 >= 0) if (cellAlive[i][j - 1] == true) neighborsAlive++; //top middle
-							if (j + 1 <= y) if (cellAlive[i][j + 1] == true) neighborsAlive++; //bottom middle
-							if (i - 1 >= 0) if (cellAlive[i - 1][j] == true) neighborsAlive++; //middle left
-							if (i + 1 <= x) if (cellAlive[i + 1][j] == true) neighborsAlive++; //middle right
-						}
+							//count neighbors
+							int neighborsAlive = 0;
+							int x = DISPLAY_WIDTH / CELL_SIZE;
+							int y = DISPLAY_HEIGHT / CELL_SIZE;
 
-						//update cell state based on rules
-						//currently using the ruleset for Conway's Game of Life
-						if (cellAlive[i][j] && neighborsAlive < 2)        cellAliveBuffer[i][j] = false; //Rule 1: Underpopulation
-						else if (!cellAlive[i][j] && neighborsAlive == 3) cellAliveBuffer[i][j] = true;  //Rule 2: Reproduction
-						else if (cellAlive[i][j] && neighborsAlive > 3)   cellAliveBuffer[i][j] = false; //Rule 3: Overpopulation
-						//if (i == 0 || i == x || j == 0 || j == y) cellAlive[i][j] = false; //Custom Rule: Edges Kill
-						else cellAliveBuffer[i][j] = cellAlive[i][j];
+							if (CELL_NEIGHBOR_SELECTION_TYPE == "Moore")
+							{
+								if (j - 1 >= 0)
+								{
+									if (i - 1 >= 0)	if (cellAlive[i - 1][j - 1] == true) neighborsAlive++; //top left
+									if (cellAlive[i][j - 1] == true) neighborsAlive++; //top middle
+									if (i + 1 <= x)	if (cellAlive[i + 1][j - 1] == true) neighborsAlive++; //top right
+								}
+								if (j + 1 <= y)
+								{
+									if (i - 1 >= 0) if (cellAlive[i - 1][j + 1] == true) neighborsAlive++; //bottom left
+									if (cellAlive[i][j + 1] == true) neighborsAlive++; //bottom middle
+									if (i + 1 <= x) if (cellAlive[i + 1][j + 1] == true) neighborsAlive++; //bottom right
+								}
+								if (i - 1 > 0) if (cellAlive[i - 1][j] == true) neighborsAlive++; //middle left
+								if (i + 1 < x) if (cellAlive[i + 1][j] == true) neighborsAlive++; //middle right
+							}
+							else if (CELL_NEIGHBOR_SELECTION_TYPE == "von Neumann")
+							{
+								if (j - 1 >= 0) if (cellAlive[i][j - 1] == true) neighborsAlive++; //top middle
+								if (j + 1 <= y) if (cellAlive[i][j + 1] == true) neighborsAlive++; //bottom middle
+								if (i - 1 >= 0) if (cellAlive[i - 1][j] == true) neighborsAlive++; //middle left
+								if (i + 1 <= x) if (cellAlive[i + 1][j] == true) neighborsAlive++; //middle right
+							}
+
+							//update cell state based on rules
+							//currently using the ruleset for Conway's Game of Life
+							if (cellAlive[i][j] && neighborsAlive < 2)        cellAliveBuffer[i][j] = false; //Rule 1: Underpopulation
+							else if (!cellAlive[i][j] && neighborsAlive == 3) cellAliveBuffer[i][j] = true;  //Rule 2: Reproduction
+							else if (cellAlive[i][j] && neighborsAlive > 3)   cellAliveBuffer[i][j] = false; //Rule 3: Overpopulation
+							//if (i == 0 || i == x || j == 0 || j == y) cellAlive[i][j] = false; //Custom Rule: Edges Kill
+							else cellAliveBuffer[i][j] = cellAlive[i][j];
+						}
 					}
 				}
 
