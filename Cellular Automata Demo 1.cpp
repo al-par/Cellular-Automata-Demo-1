@@ -61,10 +61,15 @@ int main()
 	//update loop boolean
 	bool running = true;
 
+	//utility
+	bool paused = false;
+
 	//keyboard
 	bool pressed_keys[ALLEGRO_KEY_MAX];
 	for (int i = 0; i < ALLEGRO_KEY_MAX; i++) pressed_keys[i] = false; //set all key presses to false by default
-	bool paused = false;
+
+	//mouse
+	bool clicked = false;
 
 	//cells
 	bool cellAlive[DISPLAY_WIDTH / CELL_SIZE][DISPLAY_HEIGHT / CELL_SIZE];
@@ -104,7 +109,7 @@ int main()
 
 			//---------------------------------------------------------------------------------------------------------------------------------------------------------------
 			//Update Keyboard
-			else if (event.type == ALLEGRO_EVENT_KEY_DOWN)
+			if (event.type == ALLEGRO_EVENT_KEY_DOWN)
 			{
 				for (int i = 0; i < ALLEGRO_KEY_MAX; i++)
 				{
@@ -126,7 +131,7 @@ int main()
 					if (event.keyboard.keycode == ALLEGRO_KEY_SPACE)
 					{
 						if (paused == true) paused = false;
-						if (paused == false) paused = true;
+						else if (paused == false) paused = true;
 					}
 				}
 			}
@@ -134,22 +139,27 @@ int main()
 
 			//---------------------------------------------------------------------------------------------------------------------------------------------------------------
 			//Update Mouse
-			else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN)
+			ALLEGRO_MOUSE_STATE mouseState;
+			al_get_mouse_state(&mouseState);
+			if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN)
 			{
+				clicked = true;
 				paused = true;
 			}
 			else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP)
 			{
-				paused = false;
+				clicked = false;
+				//paused = false;
 			}
-
-
-
+			if (clicked)
+			{
+				cellAliveBuffer[(mouseState.x - (mouseState.x % CELL_SIZE)) / CELL_SIZE][(mouseState.y - (mouseState.y % CELL_SIZE)) / CELL_SIZE] = true;
+			}
 
 
 			//---------------------------------------------------------------------------------------------------------------------------------------------------------------
 			//update and display page
-			else if (event.type == ALLEGRO_EVENT_TIMER && !pressed_keys[ALLEGRO_KEY_SPACE])
+			else if (event.type == ALLEGRO_EVENT_TIMER)
 			{
 				al_clear_to_color(al_map_rgba(255, 255, 255, 0));
 				
