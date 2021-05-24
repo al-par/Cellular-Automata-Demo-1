@@ -67,6 +67,7 @@ int main()
 
 	//cells
 	bool cellAlive[DISPLAY_WIDTH / CELL_SIZE][DISPLAY_HEIGHT / CELL_SIZE];
+	bool cellAliveBuffer[DISPLAY_WIDTH / CELL_SIZE][DISPLAY_HEIGHT / CELL_SIZE];
 	for (int i = 0; i < DISPLAY_WIDTH / CELL_SIZE; i++) //spawn initial cells
 	{
 		for (int j = 0; j < DISPLAY_HEIGHT / CELL_SIZE; j++)
@@ -76,6 +77,7 @@ int main()
 				cellAlive[i][j] = true;
 			}
 			else cellAlive[i][j] = false;
+			cellAliveBuffer[i][j] = cellAlive[i][j];
 		}
 	}
 
@@ -182,10 +184,20 @@ int main()
 
 						//update cell state based on rules
 						//currently using the ruleset for Conway's Game of Life
-						if (cellAlive[i][j] && neighborsAlive < 2)        cellAlive[i][j] = false; //Rule 1: Underpopulation
-						else if (!cellAlive[i][j] && neighborsAlive == 3) cellAlive[i][j] = true;  //Rule 2: Reproduction
-						else if (cellAlive[i][j] && neighborsAlive > 3)   cellAlive[i][j] = false; //Rule 3: Overpopulation
+						if (cellAlive[i][j] && neighborsAlive < 2)        cellAliveBuffer[i][j] = false; //Rule 1: Underpopulation
+						else if (!cellAlive[i][j] && neighborsAlive == 3) cellAliveBuffer[i][j] = true;  //Rule 2: Reproduction
+						else if (cellAlive[i][j] && neighborsAlive > 3)   cellAliveBuffer[i][j] = false; //Rule 3: Overpopulation
 						//if (i == 0 || i == x || j == 0 || j == y) cellAlive[i][j] = false; //Custom Rule: Edges Kill
+						else cellAliveBuffer[i][j] = cellAlive[i][j];
+					}
+				}
+
+				//copy from buffer
+				for (int i = 0; i < DISPLAY_WIDTH / CELL_SIZE; i++)
+				{
+					for (int j = 0; j < DISPLAY_HEIGHT / CELL_SIZE; j++)
+					{
+						cellAlive[i][j] = cellAliveBuffer[i][j];
 					}
 				}
 
